@@ -1,0 +1,203 @@
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+      <h2 class="h3 fw-bold text-dark mb-1">Catálogo de Productos</h2>
+      <p class="text-muted mb-0 small">Administra los productos registrados en el sistema</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-primary d-flex align-items-center gap-2"
+        (click)="getAll()"
+        [disabled]="loading()"
+        title="Actualizar lista"
+      >
+        <i class="bi bi-arrow-clockwise"></i>
+        <span>Actualizar</span>
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary d-flex align-items-center gap-2"
+        (click)="new()"
+        title="Crear nuevo producto"
+      >
+        <i class="bi bi-plus-circle"></i>
+        <span>Nuevo Producto</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      @if (loading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="text-muted mt-2 small">Cargando productos...</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" style="width: 70px;">ID</th>
+                <th scope="col" style="width: 80px;">Imagen</th>
+                <th scope="col">Título</th>
+                <th scope="col" style="width: 140px;">Categoría</th>
+                <th scope="col" style="width: 120px;">Precio</th>
+                <th scope="col" class="text-center" style="width: 160px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of productsItems(); track product.id) {
+                <tr>
+                  <td class="fw-semibold text-muted">#{{ product.id }}</td>
+                  <td>
+                    @if (product.image) {
+                      <img
+                        [src]="product.image"
+                        [alt]="product.title"
+                        class="rounded border object-fit-contain bg-white"
+                        style="width: 48px; height: 48px; padding: 2px;"
+                      />
+                    } @else {
+                      <div class="rounded border bg-light d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="bi bi-image text-muted"></i>
+                      </div>
+                    }
+                  </td>
+                  <td>
+                    <div class="fw-semibold text-truncate" style="max-width: 320px;" [title]="product.title">
+                      {{ product.title }}
+                    </div>
+                    <small class="text-muted text-truncate d-block" style="max-width: 320px;">
+                      {{ product.description }}
+                    </small>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-primary border">
+                      {{ product.category || 'Sin categoría' }}
+                    </span>
+                  </td>
+                  <td class="fw-bold text-success">
+                    ${{ product.price | number:'1.2-2' }}
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button
+                        type="button"
+                        class="btn btn-outline-info"
+                        title="Ver detalle"
+                        (click)="view(product, template)"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning"
+                        title="Editar producto"
+                        (click)="edit(product)"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        title="Eliminar producto"
+                        (click)="delete(product)"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-muted">
+                    No se encontraron productos registrados.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap p-3 border-top gap-2">
+          <small class="text-muted">
+            Mostrando {{ productsItems().length }} de {{ products().length }} productos
+          </small>
+          <pagination
+            [totalItems]="products().length"
+            [itemsPerPage]="itemsPerPage"
+            (pageChanged)="pageChanged($event)"
+            previousText="&lsaquo;"
+            nextText="&rsaquo;"
+            firstText="&laquo;"
+            lastText="&raquo;"
+            class="pagination-sm mb-0"
+          ></pagination>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Ver Detalle -->
+<ng-template #template>
+  <div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-bold">Detalle del Producto</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Cerrar"
+      (click)="modalRef?.hide()"
+    ></button>
+  </div>
+  <div class="modal-body p-4">
+    @if (productSelected) {
+      <div class="row g-4 align-items-center">
+        <div class="col-12 col-md-5 text-center">
+          <div class="p-3 border rounded bg-light">
+            <img
+              [src]="productSelected.image || 'https://placehold.co/400x400.jpg'"
+              class="img-fluid object-fit-contain"
+              style="max-height: 220px;"
+              [alt]="productSelected.title"
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-7">
+          <span class="badge bg-primary-subtle text-primary border mb-2">
+            {{ productSelected.category }}
+          </span>
+          <h4 class="h5 fw-bold text-dark">{{ productSelected.title }}</h4>
+          <h3 class="h4 text-success fw-bold my-2">
+            ${{ productSelected.price | number:'1.2-2' }}
+          </h3>
+          <p class="text-muted small mb-3">
+            {{ productSelected.description }}
+          </p>
+          <div class="small text-muted border-top pt-2">
+            <strong>ID del Producto:</strong> #{{ productSelected.id }}
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  <div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-secondary btn-sm" (click)="modalRef?.hide()">
+      Cerrar
+    </button>
+    @if (productSelected) {
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (click)="modalRef?.hide(); edit(productSelected)"
+      >
+        <i class="bi bi-pencil me-1"></i> Editar
+      </button>
+    }
+  </div>
+</ng-template>
+

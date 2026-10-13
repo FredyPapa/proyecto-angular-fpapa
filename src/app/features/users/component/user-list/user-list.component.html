@@ -1,0 +1,177 @@
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+      <h2 class="h3 fw-bold text-dark mb-1">Gestión de Usuarios</h2>
+      <p class="text-muted mb-0 small">Administra los usuarios registrados en el sistema</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-primary d-flex align-items-center gap-2"
+        (click)="getAll()"
+        [disabled]="loading()"
+        title="Actualizar lista"
+      >
+        <i class="bi bi-arrow-clockwise"></i>
+        <span>Actualizar</span>
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary d-flex align-items-center gap-2"
+        (click)="new()"
+        title="Crear nuevo usuario"
+      >
+        <i class="bi bi-person-plus"></i>
+        <span>Nuevo Usuario</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      @if (loading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="text-muted mt-2 small">Cargando usuarios...</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" style="width: 70px;">ID</th>
+                <th scope="col" style="width: 70px;">Avatar</th>
+                <th scope="col">Usuario</th>
+                <th scope="col">Correo Electrónico</th>
+                <th scope="col" class="text-center" style="width: 160px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of usersItems(); track user.id) {
+                <tr>
+                  <td class="fw-semibold text-muted">#{{ user.id }}</td>
+                  <td>
+                    <div class="avatar-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center rounded-circle border">
+                      {{ user.username ? user.username.charAt(0).toUpperCase() : 'U' }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="fw-semibold text-dark">
+                      {{ user.username }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="text-muted">
+                      <i class="bi bi-envelope me-1"></i>{{ user.email }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button
+                        type="button"
+                        class="btn btn-outline-info"
+                        title="Ver detalle"
+                        (click)="view(user, template)"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning"
+                        title="Editar usuario"
+                        (click)="edit(user)"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        title="Eliminar usuario"
+                        (click)="delete(user)"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">
+                    No se encontraron usuarios registrados.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap p-3 border-top gap-2">
+          <small class="text-muted">
+            Mostrando {{ usersItems().length }} de {{ users().length }} usuarios
+          </small>
+          <pagination
+            [totalItems]="users().length"
+            [itemsPerPage]="itemsPerPage"
+            (pageChanged)="pageChanged($event)"
+            previousText="&lsaquo;"
+            nextText="&rsaquo;"
+            firstText="&laquo;"
+            lastText="&raquo;"
+            class="pagination-sm mb-0"
+          ></pagination>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Ver Detalle del Usuario -->
+<ng-template #template>
+  <div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-bold">Detalle del Usuario</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Cerrar"
+      (click)="modalRef?.hide()"
+    ></button>
+  </div>
+  <div class="modal-body p-4">
+    @if (userSelected) {
+      <div class="text-center mb-3">
+        <div class="avatar-large bg-primary text-white fw-bold d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm mb-2" style="width: 70px; height: 70px; font-size: 1.8rem;">
+          {{ userSelected.username ? userSelected.username.charAt(0).toUpperCase() : 'U' }}
+        </div>
+        <h4 class="h5 fw-bold text-dark mb-0">{{ userSelected.username }}</h4>
+        <span class="badge bg-light text-primary border mt-1">ID: #{{ userSelected.id }}</span>
+      </div>
+
+      <div class="list-group list-group-flush border rounded">
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+          <span class="text-muted"><i class="bi bi-person me-2"></i>Nombre de Usuario:</span>
+          <span class="fw-semibold">{{ userSelected.username }}</span>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+          <span class="text-muted"><i class="bi bi-envelope me-2"></i>Correo Electrónico:</span>
+          <span class="fw-semibold">{{ userSelected.email }}</span>
+        </div>
+      </div>
+    }
+  </div>
+  <div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-secondary btn-sm" (click)="modalRef?.hide()">
+      Cerrar
+    </button>
+    @if (userSelected) {
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (click)="modalRef?.hide(); edit(userSelected)"
+      >
+        <i class="bi bi-pencil me-1"></i> Editar
+      </button>
+    }
+  </div>
+</ng-template>

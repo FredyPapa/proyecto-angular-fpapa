@@ -1,0 +1,213 @@
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+      <h2 class="h3 fw-bold text-dark mb-1">
+        {{ isEditMode() ? 'Editar Producto' : 'Nuevo Producto' }}
+      </h2>
+      <p class="text-muted mb-0 small">
+        {{ isEditMode() ? 'Modifica los datos del producto existente' : 'Completa la información para registrar un nuevo producto' }}
+      </p>
+    </div>
+    <div>
+      <button
+        type="button"
+        class="btn btn-outline-secondary d-flex align-items-center gap-2"
+        (click)="cancel()"
+      >
+        <i class="bi bi-arrow-left"></i>
+        <span>Volver a la Lista</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+            
+            <!-- Campo Título -->
+            <div class="mb-3">
+              <label for="title" class="form-label fw-semibold">Título del Producto <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="title"
+                placeholder="Ej. Mochila para laptop"
+                formControlName="title"
+                [ngClass]="{
+                  'is-invalid': pf['title'].invalid && (pf['title'].touched || submitted()),
+                }"
+              />
+              @if (pf['title'].hasError('required') && (pf['title'].touched || submitted())) {
+                <div class="invalid-feedback d-block">El título del producto es requerido.</div>
+              }
+              @if (pf['title'].hasError('minlength') && (pf['title'].touched || submitted())) {
+                <div class="invalid-feedback d-block">
+                  El título debe tener como mínimo {{ pf['title'].errors?.['minlength']?.requiredLength }} caracteres.
+                </div>
+              }
+            </div>
+
+            <div class="row g-3">
+              <!-- Campo Precio -->
+              <div class="col-12 col-md-6 mb-3">
+                <label for="price" class="form-label fw-semibold">Precio ($) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="price"
+                    placeholder="0.00"
+                    formControlName="price"
+                    [ngClass]="{
+                      'is-invalid': pf['price'].invalid && (pf['price'].touched || submitted()),
+                    }"
+                  />
+                </div>
+                @if (pf['price'].hasError('required') && (pf['price'].touched || submitted())) {
+                  <div class="invalid-feedback d-block">El precio es requerido.</div>
+                }
+                @if (pf['price'].hasError('min') && (pf['price'].touched || submitted())) {
+                  <div class="invalid-feedback d-block">El precio debe ser mayor a 0.</div>
+                }
+              </div>
+
+              <!-- Campo Categoría -->
+              <div class="col-12 col-md-6 mb-3">
+                <label for="category" class="form-label fw-semibold">Categoría <span class="text-danger">*</span></label>
+                @if (categories().length > 0) {
+                  <select
+                    class="form-select"
+                    id="category"
+                    formControlName="category"
+                    [ngClass]="{
+                      'is-invalid': pf['category'].invalid && (pf['category'].touched || submitted()),
+                    }"
+                  >
+                    <option value="" disabled selected>Selecciona una categoría</option>
+                    @for (cat of categories(); track cat) {
+                      <option [value]="cat">{{ cat }}</option>
+                    }
+                  </select>
+                } @else {
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="category"
+                    placeholder="Ej. electronics, jewelery..."
+                    formControlName="category"
+                    [ngClass]="{
+                      'is-invalid': pf['category'].invalid && (pf['category'].touched || submitted()),
+                    }"
+                  />
+                }
+                @if (pf['category'].hasError('required') && (pf['category'].touched || submitted())) {
+                  <div class="invalid-feedback d-block">La categoría es requerida.</div>
+                }
+              </div>
+            </div>
+
+            <!-- Campo URL Imagen -->
+            <div class="mb-3">
+              <label for="image" class="form-label fw-semibold">URL de la Imagen</label>
+              <input
+                type="text"
+                class="form-control"
+                id="image"
+                placeholder="https://ejemplo.com/imagen.jpg"
+                formControlName="image"
+                (input)="onImageChange()"
+              />
+              <small class="text-muted">Introduce una URL pública para visualizar la imagen</small>
+            </div>
+
+            <!-- Campo Descripción -->
+            <div class="mb-4">
+              <label for="description" class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
+              <textarea
+                rows="4"
+                class="form-control"
+                id="description"
+                placeholder="Detalla las especificaciones del producto..."
+                formControlName="description"
+                [ngClass]="{
+                  'is-invalid': pf['description'].invalid && (pf['description'].touched || submitted()),
+                }"
+              ></textarea>
+              @if (pf['description'].hasError('required') && (pf['description'].touched || submitted())) {
+                <div class="invalid-feedback d-block">La descripción del producto es requerida.</div>
+              }
+              @if (pf['description'].hasError('minlength') && (pf['description'].touched || submitted())) {
+                <div class="invalid-feedback d-block">
+                  La descripción debe tener como mínimo {{ pf['description'].errors?.['minlength']?.requiredLength }} caracteres.
+                </div>
+              }
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+              <button
+                type="button"
+                class="btn btn-outline-secondary px-4"
+                (click)="cancel()"
+                [disabled]="loading()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary px-4 d-flex align-items-center gap-2"
+                [disabled]="loading()"
+              >
+                @if (loading()) {
+                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  <span>Guardando...</span>
+                } @else {
+                  <i class="bi bi-check-circle"></i>
+                  <span>{{ isEditMode() ? 'Actualizar Producto' : 'Guardar Producto' }}</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de Vista Previa -->
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm border-0 sticky-top" style="top: 1rem;">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="card-title fw-bold mb-0 text-muted small text-uppercase">
+            <i class="bi bi-eye me-1"></i> Vista Previa del Producto
+          </h5>
+        </div>
+        <div class="card-body p-4 text-center">
+          <div class="p-3 border rounded bg-light mb-3">
+            <img
+              [src]="imagePreview()"
+              alt="Vista previa"
+              class="img-fluid object-fit-contain"
+              style="max-height: 200px;"
+              (error)="imagePreview.set('https://placehold.co/600x400.jpg')"
+            />
+          </div>
+          <span class="badge bg-light text-primary border mb-2">
+            {{ pf['category'].value || 'Categoría' }}
+          </span>
+          <h5 class="fw-bold text-dark text-truncate" [title]="pf['title'].value || 'Título del producto'">
+            {{ pf['title'].value || 'Título del producto' }}
+          </h5>
+          <h4 class="text-success fw-bold my-2">
+            ${{ pf['price'].value || 0 | number:'1.2-2' }}
+          </h4>
+          <p class="text-muted small text-truncate-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ pf['description'].value || 'La descripción del producto aparecerá aquí.' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
