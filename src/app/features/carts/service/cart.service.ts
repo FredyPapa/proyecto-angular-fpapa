@@ -3,6 +3,7 @@ import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../model/product';
+import { Cart } from '../model/cart';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,13 @@ export class CartService {
    */
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.uriProducts);
+  }
+
+  /**
+   * Envía la información de la compra (carrito) a la API vía POST
+   */
+  save(cart: Cart): Observable<Cart> {
+    return this.http.post<Cart>(this.uri, cart);
   }
 
   /**

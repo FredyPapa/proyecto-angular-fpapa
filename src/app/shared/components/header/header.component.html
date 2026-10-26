@@ -95,6 +95,7 @@
       class="btn-close"
       aria-label="Cerrar"
       (click)="modalRef?.hide()"
+      [disabled]="isPurchasing()"
     ></button>
   </div>
 
@@ -155,6 +156,7 @@
                       type="button"
                       class="btn btn-outline-secondary px-2"
                       (click)="decrement(item.id)"
+                      [disabled]="isPurchasing()"
                       title="Disminuir"
                     >
                       <i class="bi bi-dash"></i>
@@ -166,6 +168,7 @@
                       type="button"
                       class="btn btn-outline-secondary px-2"
                       (click)="increment(item.id)"
+                      [disabled]="isPurchasing()"
                       title="Aumentar"
                     >
                       <i class="bi bi-plus"></i>
@@ -183,6 +186,7 @@
                     type="button"
                     class="btn btn-outline-danger btn-sm border-0"
                     (click)="remove(item.id)"
+                    [disabled]="isPurchasing()"
                     title="Eliminar producto"
                   >
                     <i class="bi bi-trash"></i>
@@ -217,6 +221,7 @@
           type="button"
           class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
           (click)="cancelOrder()"
+          [disabled]="isPurchasing()"
         >
           <i class="bi bi-x-circle"></i>
           <span>Cancelar Pedido</span>
@@ -228,9 +233,27 @@
         type="button"
         class="btn btn-secondary btn-sm px-3"
         (click)="modalRef?.hide()"
+        [disabled]="isPurchasing()"
       >
         Seguir Comprando
       </button>
+
+      @if (cartService.cartItems().length > 0) {
+        <button
+          type="button"
+          class="btn btn-primary btn-sm px-3 d-flex align-items-center gap-1 fw-semibold"
+          (click)="purchase()"
+          [disabled]="isPurchasing()"
+        >
+          @if (isPurchasing()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Procesando...</span>
+          } @else {
+            <i class="bi bi-bag-check-fill"></i>
+            <span>Comprar</span>
+          }
+        </button>
+      }
     </div>
   </div>
 </ng-template>

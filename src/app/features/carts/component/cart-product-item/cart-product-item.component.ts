@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { Component, effect, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Product } from '../../model/product';
 import { quantityValidator } from '../../validators/quantity.validator';
+import { CartService } from '../../service/cart.service';
 
 @Component({
   selector: 'app-cart-product-item',
@@ -19,6 +20,19 @@ export class CartProductItemComponent implements OnInit {
 
   // Control reactivo con el validador personalizado (por defecto 1, no vacío, entero >= 1)
   public quantityControl = new FormControl<number | string>(1, [quantityValidator(1)]);
+
+  private cartService = inject(CartService);
+
+  constructor() {
+    // Cuando se vacía el carrito (compra realizada o cancelada), limpia y restablece la cantidad de la vista a 1
+    effect(() => {
+      if (this.cartService.cartItems().length === 0) {
+        this.quantityControl.setValue(1);
+        this.quantityControl.markAsUntouched();
+        this.quantityControl.markAsPristine();
+      }
+    });
+  }
 
   ngOnInit(): void {
     // Si el producto viene con una cantidad previa especificada, la toma
