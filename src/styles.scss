@@ -40,6 +40,7 @@ $texto-gris:#555;
     margin-top: 1rem;
     height: calc(100vh - 2rem);
     width: 280px;
+    max-width: calc(100vw - 2rem);
     z-index: 10;
     transition: .3s ease all;
     display: flex;
@@ -73,8 +74,23 @@ $texto-gris:#555;
   &__logo{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    padding: 1rem 2rem;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.25rem 25px; // 25px de padding en los laterales izquierdo y derecho
+
+    img{
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      max-height: 80px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      transition: all .3s ease;
+    }
+
     &__botonmenu{
       border: 1px solid #ccc;
       border-radius: 50%;
@@ -84,6 +100,8 @@ $texto-gris:#555;
       color: #999;
       width: 46px;
       height: 46px;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
       &:hover{
         background-color: $fondo;
       }
@@ -95,8 +113,23 @@ $texto-gris:#555;
         display: flex;
       }
     }
-    img{
-      height: 46px;
+
+    @media (width < 1023px) {
+      justify-content: space-between;
+      padding: 1rem 20px;
+      img{
+        max-width: calc(100% - 56px);
+        max-height: 48px;
+        margin: 0;
+      }
+    }
+
+    @media (width < 576px) {
+      padding: 0.75rem 15px;
+      img{
+        max-width: calc(100% - 52px);
+        max-height: 42px;
+      }
     }
   }
   &__menu{
