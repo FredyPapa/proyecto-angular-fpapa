@@ -1,7 +1,7 @@
 <header class="boder-seccion">
-  <div class="row d-flex justify-content-between">
+  <div class="row d-flex justify-content-between align-items-center">
     <div class="col-auto head_movil">
-      <img src="./img/logo.png" width="48" height="48" class="border border-primary rounded">
+      <img src="./img/logo.png" width="48" height="48" class="border border-primary rounded" alt="Logo">
       <button class="mainsite__logo__botonmenu" type="button" (click)="isShoMenu()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
           stroke="currentColor">
@@ -12,9 +12,10 @@
     <div class="col" id="header__box">
     </div>
     <div class="col-auto">
-      <ul class="nav nav-pills">
+      <ul class="nav nav-pills align-items-center">
+        <!-- Notificaciones / Mensajes existentes -->
         <li class="nav-item">
-          <a class="nav-links" aria-current="page" href="#">
+          <a class="nav-links" aria-current="page" href="#" title="Mensajes">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -23,7 +24,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-links" href="#">
+          <a class="nav-links" href="#" title="Notificaciones">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -31,6 +32,33 @@
             </svg>
           </a>
         </li>
+
+        <!-- Botón Ver Carrito -->
+        <li class="nav-item me-2">
+          <button
+            type="button"
+            class="nav-links btn btn-link position-relative border-0 bg-transparent p-2 text-dark"
+            (click)="openCartModal(cartModalTemplate)"
+            title="Ver carrito de compras"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" style="width: 24px; height: 24px;">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+            </svg>
+            @if (cartService.totalCount() > 0) {
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light"
+                style="font-size: 0.65rem;"
+              >
+                {{ cartService.totalCount() }}
+                <span class="visually-hidden">artículos en el carrito</span>
+              </span>
+            }
+          </button>
+        </li>
+
+        <!-- Usuario Autenticado -->
         <li class="nav-item">
           <div class="header__user">
             <div class="header__user__circle">
@@ -47,3 +75,162 @@
   </div>
 </header>
 <div id="blockScrem" (click)="isShoMenu()"></div>
+
+<!-- Modal de Detalle del Carrito de Compras -->
+<ng-template #cartModalTemplate>
+  <div class="modal-header border-0 pb-0">
+    <div class="d-flex align-items-center gap-2">
+      <div class="bg-primary-subtle text-primary p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+        <i class="bi bi-cart3 fs-5"></i>
+      </div>
+      <div>
+        <h5 class="modal-title fw-bold mb-0">Mi Carrito de Compras</h5>
+        <small class="text-muted">
+          {{ cartService.totalCount() }} artículo(s) seleccionado(s)
+        </small>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Cerrar"
+      (click)="modalRef?.hide()"
+    ></button>
+  </div>
+
+  <div class="modal-body p-4">
+    @if (cartService.cartItems().length === 0) {
+      <div class="text-center py-5">
+        <i class="bi bi-cart-x text-muted display-4 d-block mb-3"></i>
+        <h5 class="fw-bold text-dark">Tu carrito de compras está vacío</h5>
+        <p class="text-muted small mb-3">
+          Aún no has agregado productos. Explora la sección de Comprar para seleccionar tus favoritos.
+        </p>
+        <button
+          type="button"
+          class="btn btn-outline-primary btn-sm px-3"
+          (click)="modalRef?.hide()"
+        >
+          Ir a explorar
+        </button>
+      </div>
+    } @else {
+      <!-- Listado de Productos en el Carrito -->
+      <div class="table-responsive border rounded mb-3">
+        <table class="table align-middle table-hover mb-0">
+          <thead class="table-light small">
+            <tr>
+              <th scope="col" style="width: 60px;">Ítem</th>
+              <th scope="col">Producto</th>
+              <th scope="col" class="text-center" style="width: 130px;">Cantidad</th>
+              <th scope="col" class="text-end" style="width: 100px;">Precio</th>
+              <th scope="col" class="text-end" style="width: 110px;">Subtotal</th>
+              <th scope="col" class="text-center" style="width: 60px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of cartService.cartItems(); track item.id) {
+              <tr>
+                <td>
+                  <img
+                    [src]="item.image || './img/logo.png'"
+                    [alt]="item.title"
+                    class="rounded border bg-white p-1"
+                    style="width: 48px; height: 48px; object-fit: contain;"
+                  />
+                </td>
+                <td>
+                  <div class="fw-semibold text-dark small" [title]="item.title" style="max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ item.title }}
+                  </div>
+                  @if (item.category) {
+                    <span class="badge bg-light text-secondary border small" style="font-size: 0.7rem;">
+                      {{ item.category }}
+                    </span>
+                  }
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary px-2"
+                      (click)="decrement(item.id)"
+                      title="Disminuir"
+                    >
+                      <i class="bi bi-dash"></i>
+                    </button>
+                    <span class="btn btn-light px-3 fw-bold disabled border-top border-bottom text-dark">
+                      {{ item.quantity || 1 }}
+                    </span>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary px-2"
+                      (click)="increment(item.id)"
+                      title="Aumentar"
+                    >
+                      <i class="bi bi-plus"></i>
+                    </button>
+                  </div>
+                </td>
+                <td class="text-end text-muted small">
+                  ${{ item.price | number:'1.2-2' }}
+                </td>
+                <td class="text-end fw-bold text-dark">
+                  ${{ (item.price * (item.quantity || 1)) | number:'1.2-2' }}
+                </td>
+                <td class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm border-0"
+                    (click)="remove(item.id)"
+                    title="Eliminar producto"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Resumen de Totales -->
+      <div class="card bg-light border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="text-muted small">Total de artículos:</span>
+          <span class="fw-semibold">{{ cartService.totalCount() }} unidad(es)</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+          <span class="fw-bold fs-6">Monto Total a Pagar:</span>
+          <span class="fw-bold text-primary fs-4">
+            ${{ cartService.totalAmount() | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="modal-footer border-0 pt-0 d-flex justify-content-between flex-wrap gap-2">
+    <div>
+      @if (cartService.cartItems().length > 0) {
+        <button
+          type="button"
+          class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
+          (click)="cancelOrder()"
+        >
+          <i class="bi bi-x-circle"></i>
+          <span>Cancelar Pedido</span>
+        </button>
+      }
+    </div>
+    <div class="d-flex gap-2">
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm px-3"
+        (click)="modalRef?.hide()"
+      >
+        Seguir Comprando
+      </button>
+    </div>
+  </div>
+</ng-template>

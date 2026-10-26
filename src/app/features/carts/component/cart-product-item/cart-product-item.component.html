@@ -1,0 +1,99 @@
+<div class="card h-100 shadow-sm product-card border-0">
+  <!-- Cabecera / Imagen del Producto -->
+  <div class="product-img-container p-3 d-flex align-items-center justify-content-center bg-white position-relative">
+    @if (product.category) {
+      <span class="badge bg-light text-primary border category-badge position-absolute top-0 start-0 m-2">
+        {{ product.category }}
+      </span>
+    }
+    <img
+      [src]="imageSrc"
+      [alt]="product.title"
+      class="img-fluid product-img"
+      loading="lazy"
+    />
+  </div>
+
+  <!-- Cuerpo de la Tarjeta -->
+  <div class="card-body d-flex flex-column p-3">
+    <!-- Título -->
+    <h5 class="card-title product-title fw-bold text-dark mb-1" [title]="product.title">
+      {{ product.title }}
+    </h5>
+
+    <!-- Descripción resumida -->
+    <p class="card-text text-muted small product-desc flex-grow-1 mb-3">
+      {{ product.description }}
+    </p>
+
+    <!-- Precio -->
+    <div class="d-flex align-items-baseline justify-content-between mb-3 pt-2 border-top">
+      <span class="text-muted small">Precio:</span>
+      <span class="product-price fw-bold text-primary fs-5">
+        ${{ product.price | number:'1.2-2' }}
+      </span>
+    </div>
+
+    <!-- Selector de Cantidad con Validación Personalizada -->
+    <div class="mb-3">
+      <label class="form-label small fw-semibold text-secondary d-flex justify-content-between mb-1">
+        <span>Cantidad:</span>
+        <span class="text-danger small">*</span>
+      </label>
+      <div class="input-group input-group-sm">
+        <button
+          type="button"
+          class="btn btn-outline-secondary px-2"
+          (click)="decrement()"
+          title="Disminuir"
+          tabindex="-1"
+        >
+          <i class="bi bi-dash"></i>
+        </button>
+        <input
+          type="number"
+          class="form-control text-center fw-bold"
+          [formControl]="quantityControl"
+          min="1"
+          step="1"
+          placeholder="1"
+          [ngClass]="{ 'is-invalid': errorMessage }"
+        />
+        <button
+          type="button"
+          class="btn btn-outline-secondary px-2"
+          (click)="increment()"
+          title="Aumentar"
+          tabindex="-1"
+        >
+          <i class="bi bi-plus"></i>
+        </button>
+      </div>
+
+      <!-- Mensaje de error del Validador Personalizado -->
+      @if (errorMessage) {
+        <div class="text-danger small mt-1 d-flex align-items-center gap-1">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Botón Agregar al Carrito -->
+    <button
+      type="button"
+      class="btn w-100 d-flex align-items-center justify-content-center gap-2 fw-semibold transition-btn"
+      [ngClass]="addedFeedback() ? 'btn-success' : 'btn-primary'"
+      (click)="onAddToCart()"
+      [disabled]="quantityControl.invalid"
+    >
+      @if (addedFeedback()) {
+        <i class="bi bi-check-lg"></i>
+        <span>¡Agregado!</span>
+      } @else {
+        <i class="bi bi-cart-plus"></i>
+        <span>Agregar al carrito</span>
+      }
+    </button>
+  </div>
+</div>

@@ -1,0 +1,67 @@
+<div class="container-fluid p-0">
+  <!-- Cabecera de la sección -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h2 class="h3 fw-bold text-dark mb-1">Catálogo de Compras</h2>
+      <p class="text-muted mb-0 small">
+        Explora nuestros artículos disponibles y agrégalos a tu carrito de compras
+      </p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <!-- Resumen rápido del carrito -->
+      <div class="badge bg-white text-dark border py-2 px-3 shadow-sm d-flex align-items-center gap-2">
+        <i class="bi bi-cart3 text-primary fs-6"></i>
+        <span>En carrito:</span>
+        <span class="badge bg-primary rounded-pill">{{ cartService.totalCount() }}</span>
+      </div>
+
+      <!-- Botón recargar -->
+      <button
+        type="button"
+        class="btn btn-outline-primary d-flex align-items-center gap-2"
+        (click)="getAll()"
+        [disabled]="loading()"
+        title="Actualizar catálogo"
+      >
+        <i class="bi bi-arrow-clockwise"></i>
+        <span>Actualizar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Estado de Carga -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando catálogo...</span>
+      </div>
+      <p class="text-muted mt-2 small">Cargando productos disponibles...</p>
+    </div>
+  } @else {
+    <!-- Grilla Responsiva de Productos -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+      @for (item of products(); track item.id) {
+        <div class="col">
+          <app-cart-product-item
+            [product]="item"
+            (add)="onAddProduct($event)"
+          ></app-cart-product-item>
+        </div>
+      } @empty {
+        <div class="col-12">
+          <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+              <i class="bi bi-inbox text-muted display-4 mb-3 d-block"></i>
+              <h5 class="fw-bold text-dark">No se encontraron productos disponibles</h5>
+              <p class="text-muted small">Por favor intenta actualizar el catálogo nuevamente.</p>
+              <button class="btn btn-primary btn-sm" (click)="getAll()">
+                Recargar productos
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

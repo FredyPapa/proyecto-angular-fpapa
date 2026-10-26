@@ -22,6 +22,10 @@ export const HOME_ROUTES: Routes = [
                 path: 'users',
                 loadChildren: () => import('../../users/routes/user.routes').then(r => r.USER_ROUTES)
             },
+            {
+                path: 'carts',
+                loadChildren: () => import('../../carts/routes/carts.routes').then(r => r.CARTS_ROUTES)
+            },
         ],
     }
 ];
