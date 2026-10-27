@@ -138,6 +138,276 @@ src/app/
 
 ---
 
+## 🔌 Documentación de Endpoints (API RESTful)
+
+La aplicación consume los servicios REST provistos por **FakeStoreAPI** (`https://fakestoreapi.com`), parametrizada en `environment.URL_BASE`. A continuación se detallan los endpoints integrados, organizados por módulo, junto con sus estructuras de entrada (*Request*) y salida (*Response*):
+
+### 1. Módulo de Autenticación (`/auth`)
+
+#### 🔑 Iniciar Sesión (Login)
+* **Método / Ruta:** `POST /auth/login`
+* **Servicio:** [login.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/core/auth/login/service/login.service.ts) (`login`)
+* **Descripción:** Valida las credenciales ingresadas en el formulario de acceso y devuelve un token JWT que es almacenado en `sessionStorage`.
+
+**Request Body (`LoginRequest`):**
+```json
+{
+  "username": "mor_2314",
+  "password": "83r5^_"
+}
+```
+
+**Response (`LoginResponse` - 200 OK):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+---
+
+### 2. Módulo de Carrito de Compras (`/carts`)
+
+#### 🛍️ Registrar Compra / Guardar Carrito
+* **Método / Ruta:** `POST /carts`
+* **Servicio:** [cart.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/carts/service/cart.service.ts) (`save`)
+* **Descripción:** Envía la información de la compra generada desde el modal del carrito, asociando el ID del usuario autenticado y el arreglo de productos adquiridos con sus respectivas cantidades.
+
+**Request Body (`Cart`):**
+```json
+{
+  "id": 0,
+  "userId": 1,
+  "products": [
+    {
+      "id": 1,
+      "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+      "price": 109.95,
+      "description": "Your perfect pack for everyday use and walks in the forest...",
+      "category": "men's clothing",
+      "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+      "quantity": 2
+    }
+  ]
+}
+```
+
+**Response (`Cart` - 201 Created):**
+```json
+{
+  "id": 11,
+  "userId": 1,
+  "products": [
+    {
+      "id": 1,
+      "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+      "price": 109.95,
+      "description": "Your perfect pack for everyday use and walks in the forest...",
+      "category": "men's clothing",
+      "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+      "quantity": 2
+    }
+  ]
+}
+```
+
+---
+
+### 3. Módulo de Productos (`/products`)
+
+#### 📦 Listar Catálogo Completo
+* **Método / Ruta:** `GET /products`
+* **Servicios:** [product.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/products/service/product.service.ts) (`getAll`) y [cart.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/carts/service/cart.service.ts) (`getAll`)
+* **Descripción:** Obtiene todos los artículos disponibles para la grilla de compras y para la tabla de administración.
+* **Request:** Sin cuerpo (*None*).
+
+**Response (`Product[]` - 200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+    "price": 109.95,
+    "description": "Your perfect pack for everyday use and walks in the forest...",
+    "category": "men's clothing",
+    "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
+  }
+]
+```
+
+#### 🔍 Obtener Producto por ID
+* **Método / Ruta:** `GET /products/{id}`
+* **Servicio:** [product.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/products/service/product.service.ts) (`findById`)
+* **Parámetro de ruta:** `id: number` (ej. `/products/1`).
+
+**Response (`Product` - 200 OK):**
+```json
+{
+  "id": 1,
+  "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+  "price": 109.95,
+  "description": "Your perfect pack for everyday use and walks in the forest...",
+  "category": "men's clothing",
+  "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
+}
+```
+
+#### 🏷️ Obtener Lista de Categorías
+* **Método / Ruta:** `GET /products/categories`
+* **Servicio:** [product.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/products/service/product.service.ts) (`getCategories`)
+* **Descripción:** Recupera la colección de categorías para los selectores de filtrado y creación.
+
+**Response (`string[]` - 200 OK):**
+```json
+[
+  "electronics",
+  "jewelery",
+  "men's clothing",
+  "women's clothing"
+]
+```
+
+#### ➕ Registrar Nuevo Producto
+* **Método / Ruta:** `POST /products`
+* **Servicio:** [product.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/products/service/product.service.ts) (`save`)
+
+**Request Body (`Product`):**
+```json
+{
+  "title": "Smart Watch Pro",
+  "price": 199.99,
+  "description": "Reloj inteligente con monitor cardíaco y GPS",
+  "category": "electronics",
+  "image": ["https://placehold.co/600x400.jpg"]
+}
+```
+
+**Response (`Product` - 201 Created):**
+```json
+{
+  "id": 21,
+  "title": "Smart Watch Pro",
+  "price": 199.99,
+  "description": "Reloj inteligente con monitor cardíaco y GPS",
+  "category": "electronics",
+  "image": ["https://placehold.co/600x400.jpg"]
+}
+```
+
+#### ✏️ Actualizar Producto Existente
+* **Método / Ruta:** `PUT /products/{id}`
+* **Servicio:** [product.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/products/service/product.service.ts) (`update`)
+* **Parámetro de ruta:** `id: number`
+
+**Request Body (`Product`):**
+```json
+{
+  "title": "Smart Watch Pro (Edición Especial)",
+  "price": 179.99,
+  "description": "Descripción actualizada",
+  "category": "electronics",
+  "image": ["https://placehold.co/600x400.jpg"]
+}
+```
+
+**Response (`Product` - 200 OK):** Objeto del producto con sus campos modificados.
+
+#### 🗑️ Eliminar Producto
+* **Método / Ruta:** `DELETE /products/{id}`
+* **Servicio:** [product.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/products/service/product.service.ts) (`delete`)
+* **Parámetro de ruta:** `id: number`
+
+**Response (200 OK):** Retorna el producto eliminado como confirmación.
+
+---
+
+### 4. Módulo de Usuarios (`/users`)
+
+#### 📋 Listar Todos los Usuarios
+* **Método / Ruta:** `GET /users`
+* **Servicio:** [user.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/users/service/user.service.ts) (`getAll`)
+* **Descripción:** Devuelve la lista completa de usuarios para la gestión administrativa.
+
+**Response (`User[]` - 200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "username": "mor_2314",
+    "email": "morrison@gmail.com",
+    "password": "hashed_password"
+  }
+]
+```
+
+#### 🔍 Obtener Usuario por ID
+* **Método / Ruta:** `GET /users/{id}`
+* **Servicios:** [user.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/users/service/user.service.ts) (`findById`) y [auth.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/shared/services/auth.service.ts) (`loadUserFromToken`)
+* **Parámetro de ruta:** `id: number`
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "username": "mor_2314",
+  "email": "morrison@gmail.com",
+  "name": {
+    "firstname": "david",
+    "lastname": "morrison"
+  }
+}
+```
+
+#### 👤 Registrar / Crear Usuario
+* **Método / Ruta:** `POST /users`
+* **Servicios:** [user.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/core/auth/register/service/user.service.ts) (`create`) y [user.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/users/service/user.service.ts) (`save`)
+* **Descripción:** Usado tanto en el formulario público de registro (`/register`) como en el módulo de gestión de usuarios.
+
+**Request Body (`User`):**
+```json
+{
+  "username": "fredy_papa",
+  "email": "fredy@email.com",
+  "password": "Password123*"
+}
+```
+
+**Response (`User` - 201 Created):**
+```json
+{
+  "id": 11,
+  "username": "fredy_papa",
+  "email": "fredy@email.com",
+  "password": "Password123*"
+}
+```
+
+#### ✏️ Actualizar Usuario
+* **Método / Ruta:** `PUT /users/{id}`
+* **Servicio:** [user.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/users/service/user.service.ts) (`update`)
+* **Parámetro de ruta:** `id: number`
+
+**Request Body (`User`):**
+```json
+{
+  "id": 1,
+  "username": "mor_actualizado",
+  "email": "morrison_new@gmail.com",
+  "password": "UpdatedPassword123*"
+}
+```
+
+**Response (`User` - 200 OK):** Objeto del usuario actualizado.
+
+#### 🗑️ Eliminar Usuario
+* **Método / Ruta:** `DELETE /users/{id}`
+* **Servicio:** [user.service.ts](file:///d:/Ejercicios/Angular/angular-basico-proyecto-fpapa/src/app/features/users/service/user.service.ts) (`delete`)
+* **Parámetro de ruta:** `id: number`
+
+**Response (200 OK):** Retorna el registro del usuario eliminado.
+
+---
+
 ## 🚀 Despliegue y Ejecución
 
 ### Prerrequisitos
